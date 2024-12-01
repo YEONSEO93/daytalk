@@ -1,43 +1,56 @@
 export default class TweetService {
-  tweets = [
-    {
-      id: 1,
-      text: 'Welcome to DayTalk!',
-      createdAt: '2021-05-09T04:20:57.000Z',
-      name: 'Yeonseo',
-      username: 'YS',
-      url: 'https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-1.png',
-    },
-  ];
+  
+  constructor(baseURL = 'http://localhost:8080') {
+  this.baseURL = baseURL;
+}
 
   async getTweets(username) {
-    return username
-      ? this.tweets.filter((tweet) => tweet.username === username)
-      : this.tweets;
+    let query = username ? `?username=${username}` : '';
+    const response = await fetch(`${this.baseURL}/talks${query}`, {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json' },
+    });
+    const data = await response.json();
+    if(response.status !==200) {
+      throw new Error(data.message);
+    }
+    return data;
   }
 
   async postTweet(text) {
-    const tweet = {
-      id: Date.now(),
-      createdAt: new Date(),
-      name: 'Santa',
-      username: 'HoHo',
-      text,
-    };
-    this.tweets.push(tweet);
-    return tweet;
-  }
-
-  async deleteTweet(tweetId) {
-    this.tweets = this.tweets.filter((tweet) => tweet.id !== tweetId);
-  }
-
-  async updateTweet(tweetId, text) {
-    const tweet = this.tweets.find((tweet) => tweet.id === tweetId);
-    if (!tweet) {
-      throw new Error('Talks not found!');
+    const response = await fetch(`${this.baseURL}/talks`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, username: 'yeonseo', name: 'YEONSEO'})
+    });
+    const data = await response.json();
+    if(response.status !==201) {
+      throw new Error(data.message);
     }
-    tweet.text = text;
-    return tweet;
+    return data;
+  }
+
+  async deleteTweet(talkId) {
+    const response = await fetch(`${this.baseURL}/talks/${talkId}`, {
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json' },
+    });
+    if (response.status !== 204) {
+      const data = await response.json(); // Parse response body in case of error
+      throw new Error(data.message);
+    }
+  }
+
+  async updateTweet(talkId, text) {
+    const response = await fetch(`${this.baseURL}/talks/${talkId}`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json' },
+      body: JSON.stringify({ text})
+    });
+    const data = await response.json();
+    if(response.status !==200) {
+      throw new Error(data.message);
+    }
+    return data;
   }
 }
