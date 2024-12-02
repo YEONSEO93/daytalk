@@ -1,36 +1,21 @@
 import express from 'express';
+import * as talkRepository from '../data/talk.js';
 
-let talks = [
-  {
-    id: '1',
-    text: "welcome to DayTalk",
-    createdAt: Date.now().toString(),
-    name: 'Yeonseo',
-    username: 'YS',
-  },
-  {
-    id: '2',
-    text: "this is a user test",
-    createdAt: Date.now().toString(),
-    name: 'Ko',
-    username: 'Kk',
-  },
-];
 const router = express.Router();
 
 // GET /talks
 // GET /talks?username=:username
 router.get('/', (req, res, next) => {
   const username = req.query.username;
-  const data = username ? talks.filter(talk => talk.username === username)
-  : talks;
+  const data = username ? talkRepository.getAllByUsername(username)
+  : talkRepository.getAll;
   res.status(200).json(data);
 });
 
 // GET /talks/:id
 router.get('/:id', (req, res, next) => {
   const id = req.params.id;
-  const talk = talks.find(talk => talk.id === id);
+  const talk = talkRepository.getById(id);
   if(talk) {
     res.status(200).json(talk);
   } else {
@@ -40,14 +25,7 @@ router.get('/:id', (req, res, next) => {
 // POST /talks
 router.post('/', (req, res, next) => {
   const {text, name, username} = req.body;
-  const talk = {
-    id: Date.now().toString(),
-    text,
-    createdAt: new Date(),
-    name,
-    username,
-  };
-  talks = [talk, ...talks];
+  const talk = talkRepository.create(text, name, username);
   res.status(201).json(talk);
 });
 
@@ -55,9 +33,8 @@ router.post('/', (req, res, next) => {
 router.put('/:id', (req, res, next) => {
   const id = req.params.id;
   const text = req.body.text;
-  const talk = talks.find(talk => talk.id === id);
+  const talk = talkRepository.update(id, text);
   if(talk) {
-    talk.text = text;
     res.status(200).json(talk);
   } else {
     res.status(404).json({ message: `Talk id(${id}) not found`});
@@ -67,7 +44,7 @@ router.put('/:id', (req, res, next) => {
 // DELETE /talks/:id
 router.delete('/:id', (req, res, next) => {
   const id = req.params.id;
-  talks = talks.filter( talk => talk.id !== id);
+  talkRepository.remove(id);
   res.sendStatus(204);
 });
 export default router;
