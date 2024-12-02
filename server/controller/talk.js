@@ -1,15 +1,15 @@
 import * as talkRepository from '../data/talk.js';
 
-export function getTalks(req, res) {
+export async function getTalks(req, res) {
   const username = req.query.username;
-  const data = username ? talkRepository.getAllByUsername(username)
-  : talkRepository.getAll;
+  const data = await (username ? await talkRepository.getAllByUsername(username)
+  : talkRepository.getAll());
   res.status(200).json(data);
 }
 
-export function getTalk(req, res, next) {
+export async function getTalk(req, res, next) {
   const id = req.params.id;
-  const talk = talkRepository.getById(id);
+  const talk = await talkRepository.getById(id);
   if(talk) {
     res.status(200).json(talk);
   } else {
@@ -17,16 +17,16 @@ export function getTalk(req, res, next) {
   }
 }
 
-export function createTalk(req, res, next) {
+export async function createTalk(req, res, next) {
   const { text, name, username } = req.body;
-  const talk = talkRepository.create(text, name, username);
+  const talk = await talkRepository.create(text, name, username);
   res.status(201).json(talk);
 }
 
-export function updateTalk(req, res, next) {
+export async function updateTalk(req, res, next) {
   const id = req.params.id;
   const text = req.body.text;
-  const talk = talkRepository.update(id, text);
+  const talk = await talkRepository.update(id, text);
   if(talk) {
     res.status(200).json(talk);
   } else {
@@ -34,8 +34,8 @@ export function updateTalk(req, res, next) {
   }
 }
 
-export function deleteTalk (req, res, next) {
+export async function deleteTalk (req, res, next) {
   const id = req.params.id;
-  talkRepository.remove(id);
+  await talkRepository.remove(id);
   res.sendStatus(204);
 }

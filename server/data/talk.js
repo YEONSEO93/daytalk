@@ -15,19 +15,19 @@ let talks = [
   },
 ];
 
-export function getAll() {
+export async function getAll() {
   return talks;
 }
 
-export function getAllByUsername(username) {
+export async function getAllByUsername(username) {
   return talks.filter((talk) => talk.username === username);
 }
 
-export function getById(id) {
+export async function getById(id) {
   return talks.find((talk) => talk.id === id);
 }
 
-export function create(text, name, username) {
+export async function create(text, name, username) {
   const talk = {
     id: Date.now().toString(),
     text,
@@ -39,7 +39,7 @@ export function create(text, name, username) {
   return talk;
 }
 
-export function update(id, text) {
+export async function update(id, text) {
   const talk = talks.find(talk => talk.id === id);
   if(talk) {
     talk.text = text;
@@ -47,6 +47,6 @@ export function update(id, text) {
   return talk;
 }
 
-export function remove(id) {
+export async function remove(id) {
     talks = talks.filter( talk => talk.id !== id);
 }
